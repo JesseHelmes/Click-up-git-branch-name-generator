@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Branch Name Generator</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https://github.githubassets.com/favicons/favicon-dark.svg"
+    />
+    <style>
+      body {
+        background: black;
+        color: white;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input[type="text"],
+      select {
+        margin-bottom: 10px;
+        padding: 0.45rem;
+      }
+      .form-group,
+      #output-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.125rem;
+      }
+      #output {
+        margin-top: 10px;
+      }
+      #copy-button {
+        margin-left: 10px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .cursor-pointer {
+        cursor: pointer;
+      }
+      .btn {
+        cursor: pointer;
+        border-radius: 5px;
+        padding: 0.5rem 1rem;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-group">
+      <div>
+        <label for="type">Type:</label>
+        <select id="type">
+          <option value="-">-</option>
+          <option value="feature" selected>Feature</option>
+          <option value="bug">Bug</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="text-input">Text:</label>
+        <input type="text" id="text-input" placeholder="Enter text" />
+      </div>
+
+      <div>
+        <label for="code-input">Code:</label>
+        <input type="text" id="code-input" placeholder="Enter code" />
+      </div>
+
+      <button onclick="generateBranchName()" class="btn">
+        Generate Branch Name
+      </button>
+
+      <button onclick="resetForm()" class="btn">Clear</button>
+    </div>
+
+    <div id="output-wrapper" class="hidden">
+      <label id="output"></label>
+      <svg
+        onclick="copy()"
+        class="cursor-pointer"
+        stroke="currentColor"
+        fill="none"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="h-4 w-4"
+        height="1em"
+        width="1em"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+        ></path>
+        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+      </svg>
+    </div>
+
+    <script>
+      // Create copy to clipboard functionality
+      function copy() {
+        const branchName = document.getElementById("output").textContent;
+        const tempInput = document.createElement("input");
+        tempInput.value = branchName;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+      }
+
+      function generateBranchName() {
+        const type = document.getElementById("type").value;
+        let textInput = document.getElementById("text-input").value;
+        let codeInput = document.getElementById("code-input").value;
+
+        // Clean up the text input
+        textInput = textInput
+          .toLowerCase()
+          .replace(/[^a-z0-9\s&#-]/g, "-") // replace all non letters, number, # and & with -
+          .replace(/\s+/g, "-") // Replaces all spaces with a single '-'
+          .replace(/-+/g, "-"); // Replaces consecutive '-' characters with a single '-'
+
+        if (codeInput) {
+          // Extract the code from the URL, if it is a URL
+          codeInput = codeInput.split("/").pop();
+
+          // adds "CU-"" prefix if missing
+          if (!codeInput.startsWith("CU-")) {
+            codeInput = "CU-" + codeInput;
+          }
+
+          codeInput = "#" + codeInput;
+        }
+
+        // Generate the branch name
+        let branchName = type === "-" ? "" : type + "/";
+        branchName += textInput + codeInput;
+
+        // Display the branch name
+        const output = document.getElementById("output");
+        output.textContent = branchName;
+
+        // Show the copy button
+        const outputWrapper = document.getElementById("output-wrapper");
+        outputWrapper.classList.remove("hidden");
+      }
+
+      function resetForm() {
+        // Reset the form to default values
+        document.getElementById("type").value = "feature";
+        document.getElementById("text-input").value = "";
+        document.getElementById("code-input").value = "";
+
+        // Clear the output
+        const output = document.getElementById("output");
+        output.textContent = "";
+
+        // Remove the copy button
+        const outputWrapper = document.getElementById("output-wrapper");
+        outputWrapper.classList.add("hidden");
+      }
+    </script>
+  </body>
+</html>
